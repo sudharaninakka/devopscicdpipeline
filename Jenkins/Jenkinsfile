@@ -1,0 +1,45 @@
+pipeline {
+  agent none
+  stages {
+    stage('Pre Build Checks') {
+      agent {label 'docker'}
+      steps {
+        sh 'Jenkins/scripts/pre_build_checks.sh'
+      }
+    }
+    stage('Build') {
+      agent {label 'docker'}
+      steps {
+        sh 'Jenkins/scripts/build.sh'
+      }
+    }
+    stage('Post Build Push') {
+      agent {label 'docker'}
+      environment {
+          ghcr_USER = credentials('finsecops_ghcr_user')
+          ghcr_PAT = credentials('finsecops_ghcr_pat')
+      }
+      steps {
+        sh 'Jenkins/scripts/post_build_push.sh'
+      }
+    }
+    stage('Post Push Cleanup') {
+      agent {label 'docker'}
+      steps {
+        sh 'Jenkins/scripts/post_push_cleanup.sh'
+      }
+    }
+    stage('Post Push Deployment') {
+      agent {label 'ansible'}
+      steps {
+        sh 'Jenkins/scripts/post_push_deployment.sh'
+      }
+    }
+    stage('Post Deployment Cleanup') {
+      agent {label 'docker'}
+      steps {
+        sh 'Jenkins/scripts/post_deployment_cleanup.sh'
+      }
+    }
+  }
+}

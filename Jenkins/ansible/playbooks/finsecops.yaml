@@ -1,0 +1,18 @@
+- name: Copy and execute file
+  hosts: test_instance
+  tasks:
+    - name: Copy docker-swarm script to destination
+      ansible.builtin.copy:
+        src: /tmp/workspace/finsecops_main/Jenkins/deployment/docker-swarm.sh
+        dest: /home/ubuntu/finsecops/docker-swarm.sh
+
+    - name: Copy docker-compose file to destination
+      ansible.builtin.copy:
+        src: /tmp/workspace/finsecops_main/Jenkins/deployment/docker-compose.yaml
+        dest: /home/ubuntu/finsecops/docker-compose.yaml
+
+    - name: Download the latest image
+      command: "sh /home/ubuntu/finsecops/docker-swarm.sh"
+
+    - name: Update the swarm stack
+      command: "docker stack deploy --compose-file /home/ubuntu/deployment/docker-compose.yaml finsecops"

@@ -1,0 +1,5 @@
+all:
+  hosts:
+    test_instance:
+      ansible_user: ubuntu
+      ansible_host: 172.31.46.90
